@@ -18,7 +18,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Google Calendar API.
-  authorize(JSON.parse(content), listEvents);
+  authorize(JSON.parse(content), listCalendars);
 });
 
 /**
@@ -100,13 +100,13 @@ function storeToken(token) {
  *
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-function listEvents(auth) {
+function listEvents(auth, calendarId) {
   var calendar = google.calendar('v3');
   calendar.events.list({
     auth: auth,
-    calendarId: 'primary',
+    calendarId: calendarId,
     timeMin: (new Date()).toISOString(),
-    maxResults: 10,
+    maxResults: 100,
     singleEvents: true,
     orderBy: 'startTime'
   }, function(err, response) {
@@ -118,12 +118,35 @@ function listEvents(auth) {
     if (events.length == 0) {
       console.log('No upcoming events found.');
     } else {
-      console.log('Upcoming 10 events:');
+      console.log('Upcoming 100 events:');
       for (var i = 0; i < events.length; i++) {
         var event = events[i];
         var start = event.start.dateTime || event.start.date;
         console.log('%s - %s', start, event.summary);
       }
     }
-  });
+  });  
+}
+
+function listCalendars(auth) {
+  var calendar = google.calendar('v3');
+  calendar.calendarList.list({
+    auth: auth,
+  }, function(err, response) {
+    if (err) {
+      console.log('The API returned an error: ' + err);
+      return;
+    }
+    var calendars = response.items;
+    if (calendars.length == 0) {
+      console.log("No calendars found");
+    } else {
+      for (var i = 0; i < calendars.length; i++) {
+          var cal = calendars[i];
+          console.log("Summary: " + cal.summary);
+          console.log("Role: " + cal.accessRole);
+          listEvents(auth, cal.id);
+      }
+    }
+  });  
 }
