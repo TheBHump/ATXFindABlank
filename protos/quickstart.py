@@ -69,6 +69,19 @@ def get_events(service, calendar, maxResults = 10):
     return events
 
 def classify_event(event):
+    relevant_text = event['summary'].lower()
+    if 'description' in event:
+        relevant_text += event['description'].lower()
+    if "rally" in relevant_text or "community" in relevant_text:
+        return "Community Event"
+    elif "fundraiser" in relevant_text:
+        return "Fundraiser"
+    elif "vote" in relevant_text and "regist" in relevant_text:
+        return "Voter Reg"
+    elif "phone bank" in relevant_text:
+        return "Phone Bank"
+    elif "office" in relevant_text:
+        return "Office"
     return "Other"
 
 def already_exists(event, existing_events):
@@ -77,11 +90,13 @@ def already_exists(event, existing_events):
 def add_event(service, calendar, event):
     print(calendar)
     new_event = {}
-    new_event['description'] = "test"
-    new_event['summary'] = "test"
+    if 'description' in event:
+        new_event['description'] = event['description']
+    new_event['summary'] = event['summary']
     new_event['start'] = event['start']
     new_event['end'] = event['end']
-
+    if 'location' in event:
+        new_event['location'] = event['location']
     event = service.events().insert(calendarId = calendar['id'], body = new_event).execute()
     return event
 
