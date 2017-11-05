@@ -1,4 +1,130 @@
 * {
   box-sizing: border-box;
   margin: 0;
+  text-align: center;
+  color: #3C3D3E;
+  font-family: sans-serif;
+}
+
+body {
+  background: grey url("capitol.jpg") no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+}
+
+nav {
+  padding: 8px 20px;
+  border: 1px solid black;
+  background-color: rgba(255, 255, 255, 0.9);
+  text-align: left;
+  font-size: 20px;
+}
+
+#content  {
+  padding: 80px;
+}
+
+#menuSection {
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+#findAnEventButton {
+  margin: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background: white;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#formSection {
+  width: 300px;
+  background: white;
+  margin: auto;
+  padding: 20px 10px;
+  border-radius: 5px;
+}
+
+form {
+  text-align: left;
+}
+
+h3 {
+  padding-bottom: 25px;
+  font-size: 20px;
+}
+
+input {
+  cursor: pointer;
+}
+
+#submitButton {
+  background: blue;
+  padding: 6px 20px;
+  float: right;
+  position: relative;
+  bottom: 20px;
+  right: 5px;
+  color: white;
+  border: none;
+  box-shadow: 1px 1px grey;
+  border-radius: 2px;
+}
+
+#moreGreatResources {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  border-top: 1px solid black;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: black;
+}
+
+#menuHeader {
+  font-size: 28px;
+  padding: 5px;
+  color: black;
+}
+
+a {
+ text-decoration: none;
+ cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  padding: 5px;
+  font-size: 15px;
+  width: 30%;
+}
+
+@media only screen and (max-width: 500px) {
+  #content {
+    padding: 10px;
+  }
+  #menuHeader {
+    display: none;
+  }
+  #menuSection {
+    padding: 5px;
+    margin-top: 55%;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  #formSection {
+    width: 95%;
+    height: 100%;
+  }
+  #moreGreatResources {
+    position: relative;
+  }
 }
