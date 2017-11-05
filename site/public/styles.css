@@ -87,17 +87,6 @@ input {
   border-radius: 2px;
 }
 
-#moreGreatResources {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  border-top: 1px solid black;
-  background-color: rgba(255, 255, 255, 0.6);
-  color: black;
-}
-
 #menuHeader {
   font-size: 28px;
   padding: 5px;
@@ -107,18 +96,6 @@ input {
 a {
  text-decoration: none;
  cursor: pointer;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  padding: 5px;
-  font-size: 15px;
-  width: 30%;
 }
 
 #contentCalendar {
@@ -180,9 +157,6 @@ h4 {
   #formSection {
     width: 95%;
     height: 100%;
-  }
-  #moreGreatResources {
-    position: relative;
   }
   #contentGroup {
     padding: 10px;
