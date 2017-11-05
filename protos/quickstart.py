@@ -8,6 +8,7 @@ from oauth2client import tools
 from oauth2client.file import Storage
 
 import datetime
+import json
 
 try:
     import argparse
@@ -82,16 +83,31 @@ def classify_event(event):
         return "Phone Bank"
     elif "office" in relevant_text:
         return "Office"
+    elif "canvass" in relevant_text:
+        return "Canvass"
     return "Other"
 
-def already_exists(event, existing_events):
+def already_exists(calendarId, event, existing_events):
+    for existing_event in existing_events:
+        key = json.loads(event.description)
+        if key['source'] == calendarId and key['id'] == event['id']:
+            print("Already exists")
+            return True
     return False
 
 def add_event(service, calendar, event):
-    print(calendar)
+    primary_event = {}
+    primary_event['summary'] = event['summary']
+    primary_event['start'] = event['start']
+    primary_event['end'] = event['end']
+    primary_event['description'] = json.dumps({"source":calendar['id'],"id":event['id']})
+    service.events().insert(calendarId = 'primary', body = primary_event).execute()
     new_event = {}
     if 'description' in event:
         new_event['description'] = event['description']
+    else:
+        new_event['description'] = ""
+    new_event['description'] += "\nFor More Information: " + calendar['summary']
     new_event['summary'] = event['summary']
     new_event['start'] = event['start']
     new_event['end'] = event['end']
@@ -120,22 +136,26 @@ def main():
             # We use primary calendar as a data store
             existing_events = get_events(service, calendar)
             primary_calendar = calendar
-        elif calendar['accessRole'] == "owner" and 'description' in calendar:
+        elif calendar['accessRole'] == "owner" and 'description' in calendar and calendar['description'] in CATEGORIES:
+            #service.calendars().delete(calendarId = calendar['id']).execute()
             by_category[calendar['description']] = calendar
         elif calendar['accessRole'] == "reader":
             external_calendars.append(calendar)
 
-    #Create category calendars that don't exist yet        
+    #Create category calendars that don't exist yet  
+    id_by_category = {}      
     for category in CATEGORIES:
         if not category in by_category:
             by_category[category] = create_calendar(service, category) 
+        id_by_category[category] = by_category[category]['id']
+    print(json.dumps(id_by_category))
 
     #Load events from external calendars
     for calendar in external_calendars:
         events = get_events(service, calendar)
         print("Loading", len(events), "events")
         for event in events:
-            if already_exists(event, existing_events):
+            if already_exists(calendar['id'], event, existing_events):
                 continue
             category = classify_event(event)
             add_event(service, by_category[category], event)
