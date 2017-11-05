@@ -129,6 +129,38 @@ iframe {
   max-width: 100%;
 }
 
+#contentGroup {
+  padding: 30px;
+  text-align: center;
+}
+
+#listHere {
+  width: 100%;
+  background-color: rgba(245, 245, 245, 0.85);
+  padding: 50px;
+}
+
+.eachGroup {
+  width: 100%;
+  background: white;
+  padding: 20px;
+  border: 1px solid grey;
+}
+
+h4 {
+  font-size: 20px;
+  text-align: left;
+  padding-bottom: 5px;
+}
+
+#groupAddress {
+  text-align: left;
+}
+
+#groupAddress > a {
+  color: #00bfff;
+}
+
 @media only screen and (max-width: 500px) {
   #content {
     padding: 10px;
@@ -150,5 +182,8 @@ iframe {
   }
   #moreGreatResources {
     position: relative;
+  }
+  #contentGroup {
+    padding: 10px;
   }
 }
