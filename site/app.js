@@ -14,26 +14,26 @@ var calendarLookup = {
 var topicLookup = {
    "women's rights":[
       {
-         "organization":"Women for Good Government",
-         "url":"http://wggaustin.wixsite.com/wggaustin/meetings"
+         "name":"Women for Good Government",
+         "link":"http://wggaustin.wixsite.com/wggaustin/meetings"
       },
       {
-         "organization":"National Organization for Women",
-         "url":"https://www.facebook.com/pg/TexasStateNOW/events/?ref=page_internal"
+         "name":"National Organization for Women",
+         "link":"https://www.facebook.com/pg/TexasStateNOW/events/?ref=page_internal"
       },
       {
-         "organization":"NARAL Pro-Choice Texas",
-         "url":"https://www.facebook.com/pg/prochoicetexas/events/?ref=page_internal"
+         "name":"NARAL Pro-Choice Texas",
+         "link":"https://www.facebook.com/pg/prochoicetexas/events/?ref=page_internal"
       }
    ],
    "campaigning":[
       {
-         "organization":"Battleground Texas",
-         "url":"https://www.facebook.com/pg/BattlegroundTexas/events/?ref=page_internal"
+         "name":"Battleground Texas",
+         "link":"https://www.facebook.com/pg/BattlegroundTexas/events/?ref=page_internal"
       },
       {
-         "organization":"One Texas Resistance",
-         "url":"https://www.facebook.com/groups/onetexasresistance/events/"
+         "name":"One Texas Resistance",
+         "link":"https://www.facebook.com/groups/onetexasresistance/events/"
       }
    ],
    "racial equality":[
@@ -81,7 +81,10 @@ app.post('/form_event_type', function (req, res) {
 
 app.post('/form_topic', function(req,res) {
 	console.log(req.body);
-	res.render('form_topic', {});
+	var categories = [];
+	categories.push({name:"Women's Rights", groups:topicLookup["women's rights"]});
+	categories.push({name:"Campaigning", groups:topicLookup["campaigning"]});
+	res.render('form_topic', {categories:categories});
 })
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'))

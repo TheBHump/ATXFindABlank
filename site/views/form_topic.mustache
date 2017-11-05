@@ -7,7 +7,22 @@
   </head>
   <body>
     <nav><a href="index.html">Find a Blank</a></nav>
-    <div id="contentCalendar">
+    <div id="contentGroup">
+      <div id="listHere">
+        <h3>The following groups match your interests:</h3>
+        <!-- template below -->
+        {{#categories}}
+        <h4>{{name}}</h4>
+          {{#groups}}
+          <div class="eachGroup">
+          <h4>{{name}}</h4>
+          <p id="groupAddress"><a href="#" target="_blank">{{link}}</a></p>
+          </div>
+          {{/groups}}
+        
+        {{/categories}}
+        <!-- template above -->
+      </div>
     </div> <!-- end of content div -->
   </body>
 </html>
