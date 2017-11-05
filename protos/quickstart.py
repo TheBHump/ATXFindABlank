@@ -9,6 +9,8 @@ from oauth2client.file import Storage
 
 import datetime
 import json
+import sys
+import time
 
 try:
     import argparse
@@ -22,7 +24,7 @@ SCOPES = 'https://www.googleapis.com/auth/calendar'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
-CATEGORIES = ["Canvass","Community Event","Fundraiser","Meeting","Office","Other","Paid Canvass","Phone Bank","Training","Voter Reg"]
+CATEGORIES = ["Canvass","Community Event","Office","Other","Fundraiser","Phone Bank","Voter Reg"]
 NOW = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
 
 
@@ -62,7 +64,7 @@ def create_calendar(service, category):
     created_calendar = service.calendars().insert(body=calendar).execute()
     return created_calendar
 
-def get_events(service, calendar, maxResults = 10):
+def get_events(service, calendar, maxResults = 100):
     eventsResult = service.events().list(
         calendarId=calendar['id'], timeMin=NOW, maxResults=maxResults, singleEvents=True,
         orderBy='startTime').execute()
@@ -73,14 +75,14 @@ def classify_event(event):
     relevant_text = event['summary'].lower()
     if 'description' in event:
         relevant_text += event['description'].lower()
-    if "rally" in relevant_text or "community" in relevant_text:
-        return "Community Event"
-    elif "fundraiser" in relevant_text:
+    if "fundraiser" in relevant_text:
         return "Fundraiser"
     elif "vote" in relevant_text and "regist" in relevant_text:
         return "Voter Reg"
     elif "phone bank" in relevant_text:
         return "Phone Bank"
+    elif "rally" in relevant_text or "community" in relevant_text:
+        return "Community Event"
     elif "office" in relevant_text:
         return "Office"
     elif "canvass" in relevant_text:
@@ -88,20 +90,15 @@ def classify_event(event):
     return "Other"
 
 def already_exists(calendarId, event, existing_events):
-    for existing_event in existing_events:
-        key = json.loads(event.description)
-        if key['source'] == calendarId and key['id'] == event['id']:
-            print("Already exists")
-            return True
     return False
 
 def add_event(service, calendar, event):
-    primary_event = {}
-    primary_event['summary'] = event['summary']
-    primary_event['start'] = event['start']
-    primary_event['end'] = event['end']
-    primary_event['description'] = json.dumps({"source":calendar['id'],"id":event['id']})
-    service.events().insert(calendarId = 'primary', body = primary_event).execute()
+    #primary_event = {}
+    #primary_event['summary'] = event['summary']
+    #primary_event['start'] = event['start']
+    #primary_event['end'] = event['end']
+    #primary_event['description'] = json.dumps({"source":calendar['id'],"id":event['id']})
+    #service.events().insert(calendarId = 'primary', body = primary_event).execute()
     new_event = {}
     if 'description' in event:
         new_event['description'] = event['description']
@@ -114,7 +111,15 @@ def add_event(service, calendar, event):
     if 'location' in event:
         new_event['location'] = event['location']
     event = service.events().insert(calendarId = calendar['id'], body = new_event).execute()
+    time.sleep(.1)
     return event
+
+def delete_all_events(service, calendar):
+    events = get_events(service, calendar, maxResults = 1000)
+    for event in events:
+        service.events().delete(calendarId = calendar['id'], eventId = event['id']).execute()
+        time.sleep(.1)
+
 
 def main():
     """Shows basic usage of the Google Calendar API.
@@ -132,13 +137,15 @@ def main():
     by_category = {}
     primary_calendar = None
     for calendar in calendars:
-        if 'primary' in calendar and calendar['primary']:
+        if 'primary' in calendar and calendar['primary'] == True:
             # We use primary calendar as a data store
-            existing_events = get_events(service, calendar)
+            #existing_events = get_events(service, calendar)
             primary_calendar = calendar
+            delete_all_events(service, primary_calendar)
         elif calendar['accessRole'] == "owner" and 'description' in calendar and calendar['description'] in CATEGORIES:
             #service.calendars().delete(calendarId = calendar['id']).execute()
             by_category[calendar['description']] = calendar
+            delete_all_events(service, calendar)
         elif calendar['accessRole'] == "reader":
             external_calendars.append(calendar)
 
