@@ -15,9 +15,14 @@ app.set('views', __dirname + '/views');
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
-app.post('/form', function (req, res) {
+app.post('/form_event_type', function (req, res) {
   console.log(req.body);
-  res.render('form', { srcs: "src=" + calendarLookup['test']});
+  res.render('form_event_type', { srcs: "src=" + calendarLookup['test']});
+})
+
+app.post('/form_topic', function(req,res) {
+	console.log(req.body);
+	res.render('form_topic', {});
 })
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'))
