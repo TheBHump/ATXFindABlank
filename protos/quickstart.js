@@ -2,6 +2,7 @@ var fs = require('fs');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
+var calendarApi = google.calendar('v3');
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/calendar-nodejs-quickstart.json
@@ -10,6 +11,9 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
 var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
 
+var CATEGORIES = ["Canvass","Community Event","Fundraiser","Meeting","Office","Other","Paid Canvass","Phone Bank","Training","Voter Reg"];
+
+var owned_calendars = {};
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   if (err) {
@@ -18,8 +22,12 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
   }
   // Authorize a client with the loaded credentials, then call the
   // Google Calendar API.
-  authorize(JSON.parse(content), listCalendars);
+  authorize(JSON.parse(content), loadCalendars);
 });
+
+function loadCalendars(auth) {
+  processCalendars(auth);
+}
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -100,11 +108,10 @@ function storeToken(token) {
  *
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-function listEvents(auth, calendarId) {
-  var calendar = google.calendar('v3');
-  calendar.events.list({
+function listEvents(auth, calendar) {
+  calendarApi.events.list({
     auth: auth,
-    calendarId: calendarId,
+    calendarId: calendar.id,
     timeMin: (new Date()).toISOString(),
     maxResults: 100,
     singleEvents: true,
@@ -115,38 +122,24 @@ function listEvents(auth, calendarId) {
       return;
     }
     var events = response.items;
-    if (events.length == 0) {
-      console.log('No upcoming events found.');
-    } else {
-      console.log('Upcoming 100 events:');
-      for (var i = 0; i < events.length; i++) {
-        var event = events[i];
-        var start = event.start.dateTime || event.start.date;
-        console.log('%s - %s', start, event.summary);
-      }
-    }
+    calendar.events = events;
+    console.log(calendar);
   });  
 }
 
-function listCalendars(auth) {
-  var calendar = google.calendar('v3');
-  calendar.calendarList.list({
+function processCalendars(auth) {
+  var calendars;
+  calendarApi.calendarList.list({
     auth: auth,
   }, function(err, response) {
     if (err) {
       console.log('The API returned an error: ' + err);
       return;
     }
-    var calendars = response.items;
-    if (calendars.length == 0) {
-      console.log("No calendars found");
-    } else {
-      for (var i = 0; i < calendars.length; i++) {
-          var cal = calendars[i];
-          console.log("Summary: " + cal.summary);
-          console.log("Role: " + cal.accessRole);
-          listEvents(auth, cal.id);
+    calendars = response.items;
+    //For calendar, process the events
+    for (var i = 0; i < calendars.length; i++) {
+        listEvents(auth, calendars[i]);
       }
-    }
-  });  
+    }); 
 }
