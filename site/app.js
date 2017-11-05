@@ -16,7 +16,7 @@ app.set('views', __dirname + '/views');
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
-app.get('/', function (req, res) {
+app.post('/form', function (req, res) {
   console.log(req.body);
   res.render('form', { calendars: [calendarLookup['Other']]});
 })
